@@ -21,12 +21,15 @@ def detect():
     file = request.files['image']
     img = Image.open(file.stream).convert("RGB")
     img = np.array(img)
+    print("Detection About to Start")
 
     # Run detection
     results = model(img)
+    print("Detection completed")
 
     # Use .plot() to draw boxes on the image
     frame = results[0].plot()  # This returns a NumPy array
+    print("Image created")
     #frame = img
 
     # Convert to JPEG and send back
