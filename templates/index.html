@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Webcam Object Detection - Continuous</title>
+  <style>
+    #container {
+      display: flex;
+      gap: 20px;
+    }
+    video, img {
+      border: 2px solid #333;
+      width: 640px;
+      height: 480px;
+    }
+    button {
+      margin: 20px 10px 0 0;
+      padding: 10px 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Continuous Webcam Object Detection</h1>
+
+  <div id="container">
+    <div>
+      <h3>Original Webcam Feed</h3>
+      <video id="webcam" autoplay playsinline></video>
+    </div>
+
+    <div>
+      <h3>Processed Frame</h3>
+      <img id="result" alt="Processed frame will appear here" />
+    </div>
+  </div>
+
+  <button onclick="startDetection()">Start Detection</button>
+  <button onclick="stopDetection()">Stop Detection</button>
+
+  <script>
+    const video = document.getElementById('webcam');
+    const resultImg = document.getElementById('result');
+    let detectionInterval = null;
+
+    // Start webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(err => {
+        alert("Webcam access failed: " + err);
+      });
+
+    async function captureAndSendFrame() {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
+
+      const formData = new FormData();
+      formData.append('image', blob, 'frame.jpg');
+
+      try {
+        const response = await fetch('http://127.0.0.1:5000/detect', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (response.ok) {
+          const imgBlob = await response.blob();
+          resultImg.src = URL.createObjectURL(imgBlob);
+        } else {
+          console.error("Backend error:", await response.text());
+        }
+      } catch (error) {
+        console.error("Error sending frame:", error);
+        stopDetection();  // stop on error
+        alert("Failed to send frame to backend.");
+      }
+    }
+
+    function startDetection() {
+      if (!detectionInterval) {
+        detectionInterval = setInterval(captureAndSendFrame, 300); // every 300ms
+      }
+    }
+
+    function stopDetection() {
+      if (detectionInterval) {
+        clearInterval(detectionInterval);
+        detectionInterval = null;
+      }
+    }
+  </script>
+</body>
+</html>
