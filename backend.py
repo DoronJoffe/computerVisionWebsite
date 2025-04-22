@@ -23,11 +23,11 @@ def detect():
     img = np.array(img)
 
     # Run detection
-    #results = model(img)
+    results = model(img)
 
     # Use .plot() to draw boxes on the image
-    #frame = results[0].plot()  # This returns a NumPy array
-    frame = img
+    frame = results[0].plot()  # This returns a NumPy array
+    #frame = img
 
     # Convert to JPEG and send back
     _, jpeg = cv2.imencode('.jpg', frame)
