@@ -3,12 +3,12 @@ import cv2
 import numpy as np
 import io
 from PIL import Image
-from ultralytics import YOLO
+#from ultralytics import YOLO
 
 app = Flask(__name__)
 
 # Load YOLOv8 model
-model = YOLO('yolov8n.pt')  # You can use 'yolov8s.pt' or your custom model
+#model = YOLO('yolov8n.pt')  # You can use 'yolov8s.pt' or your custom model
 
 @app.route('/')
 def home():
