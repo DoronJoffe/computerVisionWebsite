@@ -6,8 +6,10 @@ from PIL import Image
 from ultralytics import YOLO
 from waitress import serve
 import os
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # Enable Cross-Origin Requests
 
 # Load YOLOv8 model
 model = YOLO('yolov8n.pt')  # You can use 'yolov8s.pt' or your custom model
@@ -24,7 +26,7 @@ def detect():
     print("Detection About to Start")
 
     # Run detection
-    results = model(img)
+    results = model(img, device = 'cpu')
     print("Detection completed")
 
     # Use .plot() to draw boxes on the image
