@@ -3,3 +3,4 @@ opencv-python
 pillow
 ultralytics
 waitress
+flask_cors
